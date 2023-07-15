@@ -23,7 +23,7 @@ docker run --name gitlab -p 5022:22 -p 5443:443 -p 5080:80 --network jenkins git
 
 - Install Gitlab plugin
 
-- Install tools (JDK, Maven): `Manage Jenkins` -> `Tools``: Select `Install automatically`
+- Install tools (JDK, Maven): `Manage Jenkins` -> `Tools` : Select `Install automatically`
 
 ![image](doc/Screenshot%202023-07-16%20010405.png)
 
