@@ -1,6 +1,6 @@
 # Jenkins Training
 
-Run the following command to create containers.
+Run the following commands to create containers.
 
 ```
 docker network create jenkins
