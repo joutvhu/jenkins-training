@@ -1,0 +1,17 @@
+#!/usr/bin/env groovy
+pipeline {
+    agent any
+    tools {
+        jdk 'openJdk17'
+        maven 'maven3.8.8'
+    }
+    stages {
+        stage('Build Project') {
+            steps {
+                sh '''
+                    mvn clean package
+                   '''
+            }
+        }
+    }
+}
