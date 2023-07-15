@@ -23,9 +23,15 @@ docker run --name gitlab -p 5022:22 -p 5443:443 -p 5080:80 --network jenkins git
 
 - Install Gitlab plugin
 
-- Install tools (JDK, Maven): `Manage Jenkins` -> `Tools``: Select `Install automatically``
+- Install tools (JDK, Maven): `Manage Jenkins` -> `Tools``: Select `Install automatically`
+
+![image](doc/Screenshot%202023-07-16%20010405.png)
+
+![image](doc/Screenshot%202023-07-16%20010525.png)
 
 - Create SSH key. Open terminal in container and create a SSH key.
+
+![image](doc/Screenshot%202023-07-16%20011323.png)
 
 ### GitLab Setting
 
@@ -45,6 +51,8 @@ docker run --name gitlab -p 5022:22 -p 5443:443 -p 5080:80 --network jenkins git
 
   - Select events.
 
+![image](doc/Screenshot%202023-07-16%20010734.png)
+
 - If you use Github then use `Webhook` instead of `Integration` (`Settings` -> `Webhooks` -> `Add webhook`)
 
 ### Create Jenkins Pipeline Project
@@ -55,4 +63,8 @@ docker run --name gitlab -p 5022:22 -p 5443:443 -p 5080:80 --network jenkins git
 
   - Select events.
 
+![image](doc/Screenshot%202023-07-16%20010615.png)
+
 - Add repository link, example `git@gitlab.jenkins:root/demo.git`
+
+![image](doc/Screenshot%202023-07-16%20010649.png)
