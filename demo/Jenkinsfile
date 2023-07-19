@@ -13,5 +13,25 @@ pipeline {
                    '''
             }
         }
+        stage('Junit Reports') {
+            steps {
+                jacoco(
+                    execPattern: '**/**.exec',
+                    classPattern: '**/classes',
+                    sourcePattern: '**/src/main/java',
+                    inclusionPattern: '**/*.class',
+                    exclusionPattern: '**/*Test*.class'
+                )
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        mvn clean verify sonar:sonar -Dsonar.projectName='Demo' -Dsonar.branch.name=${BRANCH_NAME}
+                       '''
+                }
+            }
+        }
     }
 }
