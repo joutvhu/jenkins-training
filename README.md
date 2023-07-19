@@ -83,11 +83,11 @@ docker network connect jenkins sonarqube
 
 - Gitlab -> User Settings -> Access Tokens
 
-![image](doc\Screenshot%202023-07-19%20205711.png)
+![image](doc/Screenshot%202023-07-19%20205711.png)
 
 - Connect SonarQube with Gitlab
 
-![image](doc\Screenshot%202023-07-19%20205950.png)
+![image](doc/Screenshot%202023-07-19%20205950.png)
 
 
 ### Install Plugin
@@ -96,15 +96,15 @@ docker network connect jenkins sonarqube
 
 - Create Token in SonarQube: User -> My Account -> Security -> Generate Token
 
-![image](doc\Screenshot%202023-07-19%20201758.png)
+![image](doc/Screenshot%202023-07-19%20201758.png)
 
 - Manage Jenkins -> System -> Add SonarQube
 
-![image](doc\Screenshot%202023-07-19%20201923.png)
+![image](doc/Screenshot%202023-07-19%20201923.png)
 
 - Connect 
 
-![image](doc\Screenshot%202023-07-19%20202119.png)
+![image](doc/Screenshot%202023-07-19%20202119.png)
 
 ### Config Maven Project
 
