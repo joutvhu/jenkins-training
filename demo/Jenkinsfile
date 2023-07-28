@@ -62,15 +62,4 @@ pipeline {
             updateGitlabCommitStatus name: 'build', state: 'success'
         }
     }
-    post {
-        aborted {
-            updateGitlabCommitStatus name: 'build', state: 'canceled'
-        }
-        failure {
-            updateGitlabCommitStatus name: 'build', state: 'failed'
-        }
-        success {
-            updateGitlabCommitStatus name: 'build', state: 'success'
-        }
-    }
 }
