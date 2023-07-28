@@ -3,6 +3,7 @@ pipeline {
     agent any
     options {
         gitLabConnection gitLabConnection: 'Gitlab', jobCredentialId: 'Gitlab_Token', useAlternativeCredential: true
+        gitlabCommitStatus('Build with Jenkins')
     }
     tools {
         jdk 'openJdk17'
@@ -13,11 +14,6 @@ pipeline {
         IS_SNAPSHOT = readMavenPom().getVersion().endsWith('-SNAPSHOT')
     }
     stages {
-        stage('Notify GitLab') {
-            steps {
-                updateGitlabCommitStatus name: 'build', state: 'running'
-            }
-        }
         stage('Build Project') {
             steps {
                 sh '''
@@ -65,17 +61,6 @@ pipeline {
                        '''
                 }
             }
-        }
-    }
-    post {
-        aborted {
-            updateGitlabCommitStatus name: 'build', state: 'canceled'
-        }
-        failure {
-            updateGitlabCommitStatus name: 'build', state: 'failed'
-        }
-        success {
-            updateGitlabCommitStatus name: 'build', state: 'success'
         }
     }
 }
