@@ -73,3 +73,4 @@ docker run --name gitlab -p 5022:22 -p 5443:443 -p 5080:80 --network jenkins git
 
 - [Sonarqube](./sonar)
 - [Multibranch Pipeline](./multibranch)
+- [Update GitLab Build Status](./gitlab-build-status)
