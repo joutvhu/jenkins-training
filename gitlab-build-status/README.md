@@ -10,37 +10,12 @@
 
 ### Config Jenkinsfile
 
-- Add gitLabConnection
+- Add gitLabConnection and gitlabBuilds
 
 ```
 options {
     gitLabConnection gitLabConnection: 'Gitlab', jobCredentialId: 'Gitlab_Token', useAlternativeCredential: true
-}
-```
-
-- Add first stage to notify to GitLab that job is running
-
-```
-stage('Notify GitLab') {
-    steps {
-        updateGitlabCommitStatus name: 'build', state: 'running'
-    }
-}
-```
-
-- Add `post` block to notify build status to GitLab
-
-```
-post {
-    aborted {
-        updateGitlabCommitStatus name: 'build', state: 'canceled'
-    }
-    failure {
-        updateGitlabCommitStatus name: 'build', state: 'failed'
-    }
-    success {
-        updateGitlabCommitStatus name: 'build', state: 'success'
-    }
+    gitlabBuilds(builds: ['Build Project', 'Junit Reports', 'SonarQube Analysis', 'Deploy to Nexus'])
 }
 ```
 
