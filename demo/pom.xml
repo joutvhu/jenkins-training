@@ -16,6 +16,18 @@
   <properties>
     <java.version>17</java.version>
   </properties>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>nexus</id>
+      <url>http://nexus.jenkins:8081/repository/maven-snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>nexus</id>
+      <url>http://nexus.jenkins:8081/repository/maven-releases</url>
+    </repository>
+  </distributionManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>

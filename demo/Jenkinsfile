@@ -1,11 +1,19 @@
 #!/usr/bin/env groovy
 pipeline {
     agent any
+    options {
+        gitLabConnection gitLabConnection: 'Gitlab', jobCredentialId: 'Gitlab_Token', useAlternativeCredential: true
+    }
     tools {
         jdk 'openJdk17'
         maven 'maven3.8.8'
     }
     stages {
+        stage('Notify GitLab') {
+            steps {
+                updateGitlabCommitStatus name: 'build', state: 'running'
+            }
+        }
         stage('Build Project') {
             steps {
                 sh '''
@@ -32,6 +40,26 @@ pipeline {
                        '''
                 }
             }
+        }
+        stage('Deploy to Nexus') {
+            steps {
+                configFileProvider([configFile('ee9017fa-4f60-472b-b428-3e44dc457159')]) {
+                    sh '''
+                        mvn deploy
+                       '''
+                }
+            }
+        }
+    }
+    post {
+        aborted {
+            updateGitlabCommitStatus name: 'build', state: 'canceled'
+        }
+        failure {
+            updateGitlabCommitStatus name: 'build', state: 'failed'
+        }
+        success {
+            updateGitlabCommitStatus name: 'build', state: 'success'
         }
     }
 }
