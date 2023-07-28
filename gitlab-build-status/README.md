@@ -10,12 +10,12 @@
 
 ### Config Jenkinsfile
 
-- Add gitLabConnection and gitlabBuilds
+- Add gitLabConnection and gitlabCommitStatus
 
 ```
 options {
     gitLabConnection gitLabConnection: 'Gitlab', jobCredentialId: 'Gitlab_Token', useAlternativeCredential: true
-    gitlabBuilds(builds: ['Build Project', 'Junit Reports', 'SonarQube Analysis', 'Deploy to Nexus'])
+    gitlabCommitStatus('Build with Jenkins')
 }
 ```
 
