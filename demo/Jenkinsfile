@@ -8,6 +8,10 @@ pipeline {
         jdk 'openJdk17'
         maven 'maven3.8.8'
     }
+    environment {
+        POM_VERSION = readMavenPom().getVersion()
+        IS_SNAPSHOT = readMavenPom().getVersion().endsWith('-SNAPSHOT')
+    }
     stages {
         stage('Notify GitLab') {
             steps {
@@ -42,6 +46,18 @@ pipeline {
             }
         }
         stage('Deploy to Nexus') {
+            when {
+                anyOf {
+                    allOf {
+                      branch 'main'
+                      environment name: 'IS_SNAPSHOT', value: 'false'
+                    }
+                    allOf {
+                      branch 'develop'
+                      environment name: 'IS_SNAPSHOT', value: 'true'
+                    }
+                }
+            }
             steps {
                 configFileProvider([configFile('ee9017fa-4f60-472b-b428-3e44dc457159')]) {
                     sh '''
