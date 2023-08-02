@@ -4,6 +4,7 @@ pipeline {
     options {
         gitLabConnection gitLabConnection: 'Gitlab', jobCredentialId: 'Gitlab_Token', useAlternativeCredential: true
         gitlabCommitStatus('Build with Jenkins')
+        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '5')
     }
     tools {
         jdk 'openJdk17'
