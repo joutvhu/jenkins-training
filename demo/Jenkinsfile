@@ -67,9 +67,10 @@ pipeline {
             steps {
                 withCredentials([gitUsernamePassword(credentialsId: 'GitLab_Account', gitToolName: 'Default')]) {
                     sh 'git fetch origin'
-                    catchError {
+                    try {
                         sh 'git tag -d v${POM_VERSION}'
                         sh 'git push --delete origin v${POM_VERSION}'
+                    } catch (err) {
                     }
                     sh 'git tag v${POM_VERSION}'
                     sh 'git push origin v${POM_VERSION}'
