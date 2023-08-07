@@ -15,7 +15,17 @@ pipeline {
         IS_SNAPSHOT = readMavenPom().getVersion().endsWith('-SNAPSHOT')
     }
     stages {
+        stage('Log Info') {
+            steps {
+                echo "BRANCH_NAME ${env.BRANCH_NAME}"
+                echo "TAG_NAME ${env.TAG_NAME}"
+                echo "CHANGE_TITLE ${env.CHANGE_TITLE}"
+            }
+        }
         stage('Build Project') {
+            when {
+              environment name: 'TAG_NAME', value: null
+            }
             steps {
                 sh '''
                     mvn clean package
@@ -64,18 +74,42 @@ pipeline {
             }
         }
         stage('Push Tag') {
+            when {
+              environment name: 'TAG_NAME', value: null
+            }
             steps {
                 withCredentials([gitUsernamePassword(credentialsId: 'GitLab_Account', gitToolName: 'Default')]) {
-                    sh 'git fetch origin'
                     script {
+                        sh 'git fetch origin'
                         try {
                             sh 'git tag -d v${POM_VERSION}'
                             sh 'git push --delete origin v${POM_VERSION}'
-                        } catch (err) {
-                        }
+                        } catch (err) {}
+                        sh 'git tag v${POM_VERSION}'
+                        sh 'git push origin v${POM_VERSION}'
                     }
-                    sh 'git tag v${POM_VERSION}'
-                    sh 'git push origin v${POM_VERSION}'
+                }
+            }
+        }
+        stage('Bump Version') {
+            when {
+                allOf {
+                    environment ignoreCase: true, name: 'TAG_NAME', value: null
+                    branch 'develop'
+                }
+            }
+            steps {
+                withCredentials([gitUsernamePassword(credentialsId: 'GitLab_Account', gitToolName: 'Default')]) {
+                    script {
+                        sh 'mvn -B release:update-versions'
+                        env.NEW_VERSION = readMavenPom().getVersion()
+                        try {
+                            sh 'git branch -D bump-version-${NEW_VERSION}'
+                        } catch (err) {}
+                        sh 'git checkout -b bump-version-${NEW_VERSION}'
+                        sh 'git -c user.name="Jenkins" -c user.email="jenkins@bd95fb12dd44" commit -a -m "Bump Version to ${NEW_VERSION}"'
+                        sh 'git push -o merge_request.create -o merge_request.target=develop -o merge_request.remove_source_branch origin refs/heads/bump-version-${NEW_VERSION}:bump-version-${NEW_VERSION} --force-with-lease=bump-version-${NEW_VERSION}:'
+                    }
                 }
             }
         }
