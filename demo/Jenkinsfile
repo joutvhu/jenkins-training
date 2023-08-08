@@ -13,6 +13,7 @@ pipeline {
     environment {
         POM_VERSION = readMavenPom().getVersion()
         IS_SNAPSHOT = readMavenPom().getVersion().endsWith('-SNAPSHOT')
+        IS_BUMP_VERSION = env.BRANCH_NAME.startsWith('bump-version-')
     }
     stages {
         stage('Log Info') {
@@ -24,7 +25,10 @@ pipeline {
         }
         stage('Build Project') {
             when {
-              environment name: 'TAG_NAME', value: null
+                allOf {
+                    environment name: 'TAG_NAME', value: null
+                    environment name: 'IS_BUMP_VERSION', value: 'false'
+                }
             }
             steps {
                 sh '''
@@ -33,6 +37,9 @@ pipeline {
             }
         }
         stage('Junit Reports') {
+            when {
+                environment name: 'IS_BUMP_VERSION', value: 'false'
+            }
             steps {
                 jacoco(
                     execPattern: '**/**.exec',
@@ -44,6 +51,9 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
+            when {
+                environment name: 'IS_BUMP_VERSION', value: 'false'
+            }
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
@@ -56,12 +66,14 @@ pipeline {
             when {
                 anyOf {
                     allOf {
-                      branch 'main'
-                      environment name: 'IS_SNAPSHOT', value: 'false'
+                        branch 'main'
+                        environment name: 'IS_SNAPSHOT', value: 'false'
+                        environment name: 'IS_BUMP_VERSION', value: 'false'
                     }
                     allOf {
-                      branch 'develop'
-                      environment name: 'IS_SNAPSHOT', value: 'true'
+                        branch 'develop'
+                        environment name: 'IS_SNAPSHOT', value: 'true'
+                        environment name: 'IS_BUMP_VERSION', value: 'false'
                     }
                 }
             }
@@ -75,7 +87,10 @@ pipeline {
         }
         stage('Push Tag') {
             when {
-              environment name: 'TAG_NAME', value: null
+                allOf {
+                    environment name: 'TAG_NAME', value: null
+                    environment name: 'IS_BUMP_VERSION', value: 'false'
+                }
             }
             steps {
                 withCredentials([gitUsernamePassword(credentialsId: 'GitLab_Account', gitToolName: 'Default')]) {
@@ -94,8 +109,10 @@ pipeline {
         stage('Bump Version') {
             when {
                 allOf {
-                    environment ignoreCase: true, name: 'TAG_NAME', value: null
-                    branch 'develop'
+                    not {
+                        environment name: 'TAG_NAME', value: null
+                    }
+                    environment name: 'IS_BUMP_VERSION', value: 'false'
                 }
             }
             steps {
@@ -106,8 +123,11 @@ pipeline {
                         try {
                             sh 'git branch -D bump-version-${NEW_VERSION}'
                         } catch (err) {}
+                        try {
+                            sh 'git push origin -d bump-version-${NEW_VERSION}'
+                        } catch (err) {}
                         sh 'git checkout -b bump-version-${NEW_VERSION}'
-                        sh 'git -c user.name="Jenkins" -c user.email="jenkins@bd95fb12dd44" commit -a -m "Bump version to ${NEW_VERSION}"'
+                        sh 'git -c user.name="Jenkins" -c user.email="jenkins@bd95fb12dd44" commit -a -m "Bump Version to ${NEW_VERSION}"'
                         sh 'git push -o merge_request.create -o merge_request.target=develop -o merge_request.remove_source_branch origin refs/heads/bump-version-${NEW_VERSION}:bump-version-${NEW_VERSION} --force-with-lease=bump-version-${NEW_VERSION}:'
                     }
                 }
